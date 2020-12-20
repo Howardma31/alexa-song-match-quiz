@@ -33,9 +33,7 @@ Project is created with:
 
 ## Design Choice
 * The instructions are not automatically provided in the beginning since many people know the rules already and might be annoyed.
-* Alexa will respond differently to the same utterances depending on whether in game or not.
-* EndGameIntent was ultimately not implemented since CancelIntent & StopIntent have similar functions.
-* AMAZON.NavigateHomeIntent not implemented because getting the answer wrong yields the similar result.
+* Alexa will respond differently to the same utterances depending on whether in quiz or not.
 
 ## Supported Artists
 * Ariana Grande
