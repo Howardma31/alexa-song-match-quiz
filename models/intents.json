@@ -1,1 +1,145 @@
-
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "song match",
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.FallbackIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": [
+            "exit",
+          ]
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.RepeatIntent",
+          "samples": [
+            "What was that again",
+            "I didn't get that",
+            "say that again",
+            "repeat that",
+            "What's that",
+            "repeat",
+          ],
+        },
+        {
+          "name": "StartQuizIntent",
+          "samples": [
+            "replay",
+            "relaunch",
+            "play",
+            "play again",
+            "launch",
+            "start over",
+            "start again",
+            "restart",
+            "open",
+            "begin",
+            "start",
+          ],
+          "slots":[]
+        },
+        {
+          "name": "ArtistAnswerIntent",
+          "samples": [
+            "{artistName}",
+            "artist is {artistName}",
+            "musician is {artistName}",
+            "favorite is {artistName}",
+          ],
+          "slots": [
+            {
+              "name": "artistName",
+              "type": "ArtistSelection",
+              "samples": []
+            }
+          ]
+        },
+        {
+          "name": "QuizAnswerIntent",
+          "samples": [
+            "{selection}",
+          ],
+          "slots": [
+            {
+              "name": "selection",
+              "type": "QuizSelection",
+              "samples": []
+            }
+          ]
+        },
+        {
+          "name": "InstructionIntent",
+          "samples": [
+            "How to play",
+            "How do you play",
+          ],
+          "slots": []
+        },
+        {
+          "name": "EasterEggIntent",
+          "samples": [
+            "volley, volley, volley"
+          ]
+        }
+      ],
+      "types": [
+        {
+          "name": "ArtistSelection",
+          "values": [
+            {
+              "name": {
+                "value": "ariana grande"
+              }
+            },
+            {
+              "name": {
+                "value": "train"
+              }
+            },
+            {
+              "name": {
+                "value": "blue"
+              }
+            },
+            {
+              "name": {
+                "value": "billy joel"
+              }
+            },
+            {
+              "name": {
+                "value": "bon jovi"
+              }
+            }
+          ]
+        },
+        {
+          "name": "QuizSelection",
+          "values": [
+            {
+              "name": {
+                "value": ""
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+© 2020 GitHub, Inc.
