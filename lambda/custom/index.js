@@ -1,6 +1,5 @@
 const Alexa = require('ask-sdk-core');
-let lastStatement, counter, inQuiz, artistName, random, item, songIndex;
-let questionDataTemp;
+let lastStatement, counter, inQuiz, artistName, item, songIndex, questionDataTemp;
 
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
@@ -12,6 +11,22 @@ const LaunchRequestHandler = {
         
         return handlerInput.responseBuilder
             .speak(welcomeMessage)
+            .reprompt(repromptMessage)
+            .getResponse();
+    }
+};
+
+const InstructionIntentHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'InstructionIntent'
+            && inQuiz === false;
+    },
+    handle(handlerInput) {
+        lastStatement = instructionMessage;
+        
+        return handlerInput.responseBuilder
+            .speak(instructionMessage)
             .reprompt(repromptMessage)
             .getResponse();
     }
@@ -49,7 +64,7 @@ const ArtistAnswerIntentHandler = {
         artistName = handlerInput.requestEnvelope.request.intent.slots.artistName.value.toString();
         if (artistExist(artistName)) {
             questionDataTemp = [...questionDataCons];
-            speakOutput = `Great. ${artistName}. Now please answer these three questions to help me match you to an ${artistName} song. First, `
+            speakOutput = getSpeechCon() + `. ${artistName}. Now please answer these three questions to help me match you to an ${artistName} song. First, `
                 + getQuestion(artistName.charAt(counter++).toLowerCase()) + getSelections() + '?';
         } else {
             speakOutput = `Sorry, I can't match this artist yet, please tell me the name of another artist`;
@@ -67,15 +82,16 @@ const QuizAnswerIntentHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'QuizAnswerIntent'
-            && inQuiz === true;
+            && inQuiz === true
+            && artistName !== '';
     },
     handle(handlerInput) {
         songIndex += getSongIndex(handlerInput.requestEnvelope.request.intent.slots.selection.value.toString());
         if (counter === 3) {
-            lastStatement = `Based on your answers, your ${artistName} Song Match is ` + getSong(songIndex) + `${songIndex}` + `. Would you like to get another Song Match with a different artist?`;
+            lastStatement = `Based on your answers, your ${artistName} Song Match is ` + getSong(songIndex) + `. Would you like to get another Song Match with a different artist?`;
             inQuiz = false;
         } else {
-            lastStatement = `Got it. Question ${++counter}, ` + getQuestion(artistName.charAt(counter).toLowerCase()) + getSelections() + '?';
+            lastStatement = getSpeechCon() + `. Question ${++counter}, ` + getQuestion(artistName.charAt(counter).toLowerCase()) + getSelections() + '?';
         }
         
         return handlerInput.responseBuilder
@@ -136,7 +152,13 @@ const CancelAndStopIntentHandler = {
 const FallbackIntentHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.FallbackIntent';
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.FallbackIntent'
+                || ((Alexa.getIntentName(handlerInput.requestEnvelope) === 'InstructionIntent'
+                    || Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.HelpIntent')
+                && inQuiz === true)
+                    || ((Alexa.getIntentName(handlerInput.requestEnvelope) === 'ArtistAnswerIntent'
+                        || Alexa.getIntentName(handlerInput.requestEnvelope) === 'QuizAnswerIntent')
+                    && inQuiz === false);
     },
     handle(handlerInput) {
         const speakOutput = 'Sorry, I don\'t know about that. Please try again.';
@@ -211,22 +233,32 @@ const repromptMessage = `You can ask me to start a quiz or to read the instructi
 const instructionMessage = `I can help you understand which song by your favorite artist best matches your life. 
         Tell me the name of your favorite artist, then answer three questions and I'll help match you to one of their songs.`;
 const exitSkillMessage = `Thank you for using Song Match. For another great skill, check out Song Quiz!`;
-const speechCons = ['Great', 'All righty', 'Got it', 'Gotcha', 'Awesome'];
+const speechCons = ['Great', 'All righty', 'Got it', 'Gotcha', 'Awesome', 'Nice', 'Cool'];
 const questionDataCons = [
-    {Question: 'What is your favorite color?', Selections: ['red', 'blue', 'yellow']},
-    {Question: 'How are you feeling right this moment?', Selections: ['curious', 'sad', 'happy', 'anxious']},
-    {Question: 'Which emoji do you prefer?', Selections: ['black hearts', 'white clouds']},
-    {Question: 'What is your best quality?', Selections: ['intelligence', 'charisma', 'independence', 'empathy']},
-    {Question: 'Which place do you want to visit the most?', Selections: ['paris', 'las vegas', 'tokyo']},
+    {Question: 'Which insect represents you the most?', Selections: ['praying mantis', 'grasshopper', 'scorpian']},
+    {Question: 'What would you rather do?', Selections: ['sky diving', 'bungee jumping', 'sea diving', 'rock climbing']},
+    {Question: 'Which do you fear the most?', Selections: ['sky diving', 'bungee jumping', 'sea diving', 'rock climbing']},
+    {Question: 'Which place do you want to visit the most?', Selections: ['paris', 'las vegas', 'tokyo', 'london']},
+    {Question: 'Which food do you enjoy the most?', Selections: ['sushi', 'pizza', 'hamburger', 'hot dog']},
+    {Question: 'What time of day is your favorite?', Selections: ['morning', 'afternoon', 'evening', 'night']},
+    {Question: 'Are you an early bird or night owl?', Selections: ['early bird', 'night owl']},
 ];
 const artistDataCons = [
-    {Name: 'ariana grande', Songs: ['God is a woman', 'Positions', 'Rain On Me']},
-    {Name: 'blue', Songs: ['One Love', 'All Rise', 'Best In Me']},
-    {Name: 'train', Songs: ['Drops of Jupiter', 'Drive By', 'Hey, Soul Sister']},
+    {Name: 'ariana grande', Songs: ['God is a woman', 'Positions', 'Rain On Me', '7 rings']},
+    {Name: 'blue', Songs: ['One Love', 'All Rise', 'Best In Me', 'U Make Me Wanna']},
+    {Name: 'train', Songs: ['Drops of Jupiter', 'Drive By', 'Hey, Soul Sister', '50 Ways to Say Goodbye']},
+    {Name: 'billy joel', Songs: ['Uptown Girl', 'Piano Man', 'My Life', 'Vienna']},
+    {Name: 'bon jovi', Songs: ['Living On A Prayer', 'You Give Love A Bad Name', 'Wanted Dead Or Alive', 'Bed Of Roses']},
 ];
 
 /* HELPER FUNCTIONS */
 
+// Returns a random speech word
+function getSpeechCon() {
+    return speechCons[getRandom(0, speechCons.length - 1)];
+}
+
+// Returns a random number in a range
 function getRandom(min, max) {
     return Math.floor((Math.random() * ((max - min) + 1)) + min);
 }
@@ -273,7 +305,7 @@ function getSong(songIndex) {
     return 'Artist not available';
 }
 
-// Checks if artist exists
+// Returns true if artist exists, otherwise return false
 function artistExist(artistName) {
     for (let i = 0; i < artistDataCons.length; ++i) {
         if (artistDataCons[i].Name === artistName.toLowerCase()) {
@@ -291,6 +323,7 @@ function artistExist(artistName) {
 exports.handler = Alexa.SkillBuilders.custom()
     .addRequestHandlers(
         LaunchRequestHandler,
+        InstructionIntentHandler,
         StartQuizIntentHandler,
         ArtistAnswerIntentHandler,
         QuizAnswerIntentHandler,
