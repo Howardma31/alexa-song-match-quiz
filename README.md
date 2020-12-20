@@ -1,2 +1,45 @@
 # Alexa "Song Match" Quiz
-Song Match Quiz Game for Alexa
+![](images/ReadMeBanner.png)
+
+Alexa quiz created using JavaScript and Node.js in the Alexa Developer Console
+
+## Table of Contents
+* [General info](#general-info)
+* [Technologies](#technologies)
+* [Setup](#setup)
+* [Features](#features)
+* [Design Choice](#design-choice)
+* [Supported Artists](#supported-artist)
+
+## General info
+This quiz matches the user to a song of their choice of artist based on their selections in the Alexa environment.
+
+## Technologies
+Project is created with:
+* JavaScript
+* Node.js
+* Alexa Developer Console
+
+## Setup
+* Open Alexa Developer Console and paste index.js into the corresponding file, other files were unchanged.
+* Set up the necessary intents shown in models/intents.json.
+
+## Features
+* Starts a "Song Match" quiz.
+* Asks a series of questions and matches a song.
+* Provides a list of commands.
+* Repeats the last statement.
+* Stops the quiz.
+
+## Design Choice
+* The instructions are not automatically provided in the beginning since many people know the rules already and might be annoyed.
+* Alexa will respond differently to the same utterances depending on whether in game or not.
+* EndGameIntent was ultimately not implemented since CancelIntent & StopIntent have similar functions.
+* AMAZON.NavigateHomeIntent not implemented because getting the answer wrong yields the similar result.
+
+## Supported Artists
+* Ariana Grande
+* Train
+* Billy Joel
+* Bon Jovi
+* More to be added...
