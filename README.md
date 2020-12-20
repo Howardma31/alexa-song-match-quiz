@@ -34,7 +34,7 @@ Project is created with:
 ## Design Choice
 * The instructions are not automatically provided in the beginning since many people know the rules already and might be annoyed.
 * Alexa will respond differently to the same utterances depending on whether in quiz or not.
-* I chose not to use AMAZON.Musician due to the many unwanted utterance conflicts.
+* AMAZON.Musician was not used due to the many unwanted utterance conflicts.
 
 ## Supported Artists
 * Ariana Grande
