@@ -27,6 +27,7 @@ Project is created with:
 
 ## Features
 * Starts a "Song Match" quiz.
+* Asks another artist if the artist provided is not supported.
 * Asks a series of questions and matches a song.
 * Provides a list of commands.
 * Repeats the last statement.
