@@ -85,8 +85,9 @@
         {
           "name": "InstructionIntent",
           "samples": [
-            "How to play",
-            "How do you play",
+            "instruction",
+            "instructions",
+            "How does it work",
           ],
           "slots": []
         },
@@ -113,12 +114,12 @@
             },
             {
               "name": {
-                "value": "blue"
+                "value": "jason mraz"
               }
             },
             {
               "name": {
-                "value": "billy joel"
+                "value": "pentatonix"
               }
             },
             {
