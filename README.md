@@ -23,7 +23,7 @@ Project is created with:
 
 ## Setup
 * Open Alexa Developer Console and paste index.js into the corresponding file, other files were unchanged.
-* Set up the necessary intents shown in models/intents.json.
+* Set up the necessary intents shown in models/en-US.json.
 
 ## Features
 * Starts a "Song Match" quiz.
