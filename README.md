@@ -13,7 +13,7 @@ Alexa quiz created using JavaScript and Node.js in the Alexa Developer Console
 * [Bonus](#bonus)
 
 ## General info
-This quiz matches the user to a song of their choice of artist based on their selections in the Alexa environment.
+This quiz matches the user to a song of their artist of choice based on their selections in the Alexa environment.
 
 ## Technologies
 Project is created with:
