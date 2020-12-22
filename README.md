@@ -10,6 +10,7 @@ Alexa quiz created using JavaScript and Node.js in the Alexa Developer Console
 * [Features](#features)
 * [Design Choice](#design-choice)
 * [Supported Artists](#supported-artist)
+* [Bonus](#bonus)
 
 ## General info
 This quiz matches the user to a song of their choice of artist based on their selections in the Alexa environment.
@@ -44,3 +45,6 @@ Project is created with:
 * Pentatonix
 * Bon Jovi
 * More to be added...
+
+## Bonus
+* Try saying "Volley, volley, volley"!
