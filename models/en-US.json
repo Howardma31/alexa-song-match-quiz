@@ -26,6 +26,14 @@
           "samples": []
         },
         {
+          "name": "AMAZON.YesIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NoIntent",
+          "samples": []
+        },
+        {
           "name": "AMAZON.RepeatIntent",
           "samples": [
             "What was that again",
