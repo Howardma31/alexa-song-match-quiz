@@ -164,7 +164,8 @@ const FallbackIntentHandler = {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.FallbackIntent'
                 || ((Alexa.getIntentName(handlerInput.requestEnvelope) === 'InstructionIntent'
-                    || Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.HelpIntent')
+                    || Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.HelpIntent'
+                        || Alexa.getIntentName(handlerInput.requestEnvelope) === 'EasterEggIntent')
                 && inQuiz === true)
                     || ((Alexa.getIntentName(handlerInput.requestEnvelope) === 'ArtistAnswerIntent'
                         || Alexa.getIntentName(handlerInput.requestEnvelope) === 'QuizAnswerIntent')
@@ -233,6 +234,23 @@ const ErrorHandler = {
         return handlerInput.responseBuilder
             .speak(speakOutput)
             .reprompt(speakOutput)
+            .getResponse();
+    }
+};
+
+const EasterEggIntentHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'EasterEggIntent'
+            && inQuiz === false;
+    },
+    handle(handlerInput) {
+        lastStatement = `Thank you for reading the whole read me! or you are also really 
+        excited about volley, no matter which one is it, here's an easter egg for you!
+        clap, clap, clap.` + repromptMessage;
+        return handlerInput.responseBuilder
+            .speak(lastStatement)
+            .reprompt(repromptMessage)
             .getResponse();
     }
 };
