@@ -37,6 +37,7 @@ Project is created with:
 * Alexa will respond differently to the same utterances depending on whether in quiz or not.
 * AMAZON.Musician was not used due to many unwanted utterance conflicts.
 * ArtistAnswerIntentHandler takes into account QuizAnswerIntent because it priortises QuizAnswerIntent when an unknown musician is heard.
+* AMAZON.NavigateHomeIntent not implemented because restarting game yield similar results and instruction can be get at anytime.
 
 ## Supported Artists
 * Ariana Grande
