@@ -1,5 +1,5 @@
 const Alexa = require('ask-sdk-core');
-let lastStatement, counter, inQuiz, artistName, item, songIndex, questionDataTemp;
+let lastStatement, counter, inQuiz, artistName, item, songIndex, questionDataTemp, questionAsked;
 
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
@@ -36,7 +36,8 @@ const StartQuizIntentHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'StartQuizIntent'
-            && inQuiz === false;
+                || Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.YesIntent'
+                && handlerInput.attributesManager.getSessionAttributes().questionAsked === 'Would you like to get another Song Match';
     },
     handle(handlerInput) {
         counter = 0;
@@ -46,8 +47,8 @@ const StartQuizIntentHandler = {
         lastStatement = 'Please tell me the name of your favorite artist.';
         
         return handlerInput.responseBuilder
-            .speak('Please tell me the name of your favorite artist.')
-            .reprompt('Please tell me the name of your favorite artist.')
+            .speak(lastStatement)
+            .reprompt(lastStatement)
             .getResponse();
     }
 };
@@ -55,13 +56,19 @@ const StartQuizIntentHandler = {
 const ArtistAnswerIntentHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'ArtistAnswerIntent'
+            && (Alexa.getIntentName(handlerInput.requestEnvelope) === 'ArtistAnswerIntent'
+                || Alexa.getIntentName(handlerInput.requestEnvelope) === 'QuizAnswerIntent')
             && inQuiz === true
             && artistName === '';
     },
     handle(handlerInput) {
-        let speakOutput;
-        artistName = handlerInput.requestEnvelope.request.intent.slots.artistName.value.toString();
+        let speakOutput = '';
+        if (handlerInput.requestEnvelope.request.intent.slots.artistName !== undefined) {
+            artistName = handlerInput.requestEnvelope.request.intent.slots.artistName.value.toString();
+        } else if (handlerInput.requestEnvelope.request.intent.slots.selection !== undefined) {
+            artistName = handlerInput.requestEnvelope.request.intent.slots.selection.value.toString();
+        }
+        
         if (artistExist(artistName)) {
             questionDataTemp = [...questionDataCons];
             speakOutput = getSpeechCon() + `. ${artistName}. Now please answer these three questions to help me match you to an ${artistName} song. First, `
@@ -73,7 +80,7 @@ const ArtistAnswerIntentHandler = {
         lastStatement = speakOutput;
         return handlerInput.responseBuilder
             .speak(speakOutput)
-            .reprompt()
+            .reprompt(speakOutput)
             .getResponse();
     }
 };
@@ -89,6 +96,7 @@ const QuizAnswerIntentHandler = {
         songIndex += getSongIndex(handlerInput.requestEnvelope.request.intent.slots.selection.value.toString());
         if (counter === 3) {
             lastStatement = `Based on your answers, your ${artistName} Song Match is ` + getSong(songIndex) + `. Would you like to get another Song Match with a different artist?`;
+            setQuestion(handlerInput, 'Would you like to get another Song Match');
             inQuiz = false;
         } else {
             lastStatement = getSpeechCon() + `. Question ${++counter}, ` + getQuestion(artistName.charAt(counter).toLowerCase()) + getSelections() + '?';
@@ -110,7 +118,7 @@ const RepeatIntentHandler = {
         
         return handlerInput.responseBuilder
             .speak(lastStatement)
-            .reprompt(repromptMessage)
+            .reprompt(lastStatement)
             .getResponse();
     }
 };
@@ -134,7 +142,9 @@ const CancelAndStopIntentHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
             && (Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.CancelIntent'
-                || Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.StopIntent');
+                || Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.StopIntent'
+                    || Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.NoIntent'
+                    && handlerInput.attributesManager.getSessionAttributes().questionAsked === 'Would you like to get another Song Match');
     },
     handle(handlerInput) {
 
@@ -162,6 +172,7 @@ const FallbackIntentHandler = {
     },
     handle(handlerInput) {
         const speakOutput = 'Sorry, I don\'t know about that. Please try again.';
+        lastStatement = speakOutput;
         
         return handlerInput.responseBuilder
             .speak(speakOutput)
@@ -233,22 +244,26 @@ const repromptMessage = `You can ask me to start a quiz or to read the instructi
 const instructionMessage = `I can help you understand which song by your favorite artist best matches your life. 
         Tell me the name of your favorite artist, then answer three questions and I'll help match you to one of their songs.`;
 const exitSkillMessage = `Thank you for using Song Match. For another great skill, check out Song Quiz!`;
-const speechCons = ['Great', 'All righty', 'Got it', 'Gotcha', 'Awesome', 'Nice', 'Cool'];
+const speechCons = ['Great', 'All righty', 'Got it', 'Gotcha', 'Awesome', 'Nice', 'Cool', `That's what I would've picked`, `Same`];
 const questionDataCons = [
-    {Question: 'Which insect represents you the most?', Selections: ['praying mantis', 'grasshopper', 'scorpian']},
-    {Question: 'What would you rather do?', Selections: ['sky diving', 'bungee jumping', 'sea diving', 'rock climbing']},
-    {Question: 'Which do you fear the most?', Selections: ['sky diving', 'bungee jumping', 'sea diving', 'rock climbing']},
-    {Question: 'Which place do you want to visit the most?', Selections: ['paris', 'las vegas', 'tokyo', 'london']},
-    {Question: 'Which food do you enjoy the most?', Selections: ['sushi', 'pizza', 'hamburger', 'hot dog']},
-    {Question: 'What time of day is your favorite?', Selections: ['morning', 'afternoon', 'evening', 'night']},
-    {Question: 'Are you an early bird or night owl?', Selections: ['early bird', 'night owl']},
+    {Question: 'Which is better?', Selections: ['dogs', 'cats']},
+    {Question: 'What would you rather do?', Selections: ['sky diving', 'sea diving', 'rock climbing']},
+    {Question: 'Which do you fear the most?', Selections: ['darkness', 'clowns', 'height']},
+    {Question: 'Which place do you want to visit the most?', Selections: ['paris', 'las vegas', 'tokyo', 'dubai']},
+    {Question: 'Which food do you enjoy the most?', Selections: ['sushi', 'pizza', 'steak']},
+    {Question: 'Which one are you?', Selections: ['early bird', 'night owl']},
+    {Question: 'What is your favorite ice cream flavor?', Selections: ['rum raisin', 'mint chocolate', 'vanilla']},
+    {Question: 'What is the best drink to go with your pizza?', Selections: ['water', 'soda', 'milk']},
+    {Question: 'Which is the better monster?', Selections: ['vampires', 'zombies', 'godzilla']},
+    {Question: 'Which is your favorite instrument?', Selections: ['piano', 'guitar', 'harmonica']},
+    {Question: 'What is the best pet to have?', Selections: ['fish', 'lizard', 'bird']},
 ];
 const artistDataCons = [
-    {Name: 'ariana grande', Songs: ['God is a woman', 'Positions', 'Rain On Me', '7 rings']},
-    {Name: 'blue', Songs: ['One Love', 'All Rise', 'Best In Me', 'U Make Me Wanna']},
-    {Name: 'train', Songs: ['Drops of Jupiter', 'Drive By', 'Hey, Soul Sister', '50 Ways to Say Goodbye']},
-    {Name: 'billy joel', Songs: ['Uptown Girl', 'Piano Man', 'My Life', 'Vienna']},
-    {Name: 'bon jovi', Songs: ['Living On A Prayer', 'You Give Love A Bad Name', 'Wanted Dead Or Alive', 'Bed Of Roses']},
+    {Name: 'ariana grande', Songs: ['God is a woman', 'Positions', 'Rain On Me', '7 rings', 'Santa Tell Me', 'No tears left to cry']},
+    {Name: 'jason mraz', Songs: [`I'm Yours`, 'Lucky', `I won't give up`, 'Have it all', 'Love someone']},
+    {Name: 'train', Songs: ['Drops of Jupiter', 'Drive By', 'Hey, Soul Sister', '50 Ways to Say Goodbye', 'Play that song']},
+    {Name: 'pentatonix', Songs: ['Sing', `Can't sleep love`, 'Cheerleader', 'Problem', 'Daft Punk', 'Rather be']},
+    {Name: 'bon jovi', Songs: ['Living On A Prayer', 'You Give Love A Bad Name', 'Wanted Dead Or Alive', 'Bed Of Roses', 'Always']},
 ];
 
 /* HELPER FUNCTIONS */
@@ -297,9 +312,10 @@ function getSongIndex(selection) {
 
 // Returns the song matched
 function getSong(songIndex) {
+    let songValue;
     for (let i = 0; i < artistDataCons.length; ++i) {
         if (artistDataCons[i].Name === artistName.toLowerCase()) {
-            return artistDataCons[i].Songs[songIndex % artistDataCons[i].Songs.length];
+            return artistDataCons[i].Songs[songIndex % (artistDataCons[i].Songs.length - 1)];
         }
     }
     return 'Artist not available';
@@ -313,6 +329,13 @@ function artistExist(artistName) {
         }
     }
     return false;
+}
+
+// Sets the current Yes/No question
+function setQuestion(handlerInput, questionAsked) {
+  const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+  sessionAttributes.questionAsked = questionAsked;
+  handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 }
 
 /**
