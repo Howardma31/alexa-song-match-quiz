@@ -32,9 +32,10 @@ Project is created with:
 * Stops the quiz.
 
 ## Design Choice
-* The instructions are not automatically provided in the beginning since many people know the rules already and might be annoyed.
+* The instructions are not automatically provided in the beginning since many people know the rules already.
 * Alexa will respond differently to the same utterances depending on whether in quiz or not.
-* AMAZON.Musician was not used due to the many unwanted utterance conflicts.
+* AMAZON.Musician was not used due to many unwanted utterance conflicts.
+* ArtistAnswerIntentHandler takes into account QuizAnswerIntent because it priortises QuizAnswerIntent when an unknown musician is heard.
 
 ## Supported Artists
 * Ariana Grande
