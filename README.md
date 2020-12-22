@@ -39,8 +39,8 @@ Project is created with:
 
 ## Supported Artists
 * Ariana Grande
-* Blue
+* Jason Mraz
 * Train
-* Billy Joel
+* Pentatonix
 * Bon Jovi
 * More to be added...
